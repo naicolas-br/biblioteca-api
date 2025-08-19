@@ -29,46 +29,42 @@ class BookController extends Controller
      */
     public function index(Request $request)
     {
-        // TODO: Implementar aqui
-        //
-        // Dicas:
-        // - Use os scopes do Model Book: search(), byAuthor(), byAvailability(), byYearRange()
-        // - Use with('author') para eager loading
-        // - Use when() para aplicar filtros condicionalmente
-        // - Normalize per_page (min: 1, max: 100, default: 15)
-        //
-        // Exemplo:
-        // $books = Book::with('author')
-        //             ->when($request->q, function($query, $term) {
-        //                 $query->search($term);
-        //             })
-        //             ->when($request->author_id, function($query, $authorId) {
-        //                 $query->byAuthor($authorId);
-        //             })
-        //             ->when($request->has('disponivel'), function($query) use ($request) {
-        //                 $query->byAvailability($request->boolean('disponivel'));
-        //             })
-        //             ->when($request->ano_de || $request->ano_ate, function($query) use ($request) {
-        //                 $query->byYearRange($request->ano_de, $request->ano_ate);
-        //             })
-        //             ->orderBy($request->sort ?? 'titulo')
-        //             ->paginate($request->per_page ?? 15);
-        //
-        // return new PaginatedResource(BookResource::collection($books));
-        
-        return response()->json([
-            'message' => 'TODO: Implementar listagem de livros com filtros',
-            'endpoint' => 'GET /api/books',
-            'available_filters' => [
-                'q' => 'Buscar em título e gênero',
-                'author_id' => 'Filtrar por autor',
-                'disponivel' => 'true/false para disponibilidade',
-                'ano_de' => 'Ano mínimo de publicação', 
-                'ano_ate' => 'Ano máximo de publicação',
-                'sort' => 'Campo para ordenação'
-            ],
-            'documentation' => 'Consulte docs/API_ENDPOINTS.md'
-        ], 501);
+        // Normaliza o número de itens por página, garantindo que esteja entre 1 e 100.
+        $perPage = max(1, min(100, (int) $request->input('per_page', 15)));
+
+        $books = Book::query()
+            // Faz o Eager Loading do autor para evitar o problema de N+1 queries.
+            ->with('author')
+
+            // Aplica os filtros condicionalmente, apenas se eles existirem na request.
+            ->when($request->input('q'), function ($query, $term) {
+                // Assume que o Model Book tem um scope 'search'
+                $query->search($term);
+            })
+            ->when($request->input('author_id'), function ($query, $authorId) {
+                // Assume que o Model Book tem um scope 'byAuthor'
+                $query->byAuthor($authorId);
+            })
+            ->when($request->has('disponivel'), function ($query) use ($request) {
+                // Assume que o Model Book tem um scope 'byAvailability'
+                $query->byAvailability($request->boolean('disponivel'));
+            })
+            ->when($request->input('ano_de') || $request->input('ano_ate'), function ($query) use ($request) {
+                // Assume que o Model Book tem um scope 'byYearRange'
+                $query->byYearRange($request->input('ano_de'), $request->input('ano_ate'));
+            })
+
+            // Aplica a ordenação.
+            // TODO: É uma boa prática criar um scope 'orderBy' no Model Book,
+            // assim como você fez no Author, para validar os campos.
+            ->applyOrder($request->input('sort', 'titulo'), $request->input('direction', 'asc'))
+
+            // Executa a paginação e mantém os parâmetros de filtro nos links.
+            ->paginate($perPage)
+            ->withQueryString();
+
+        // Retorna a resposta paginada usando os Resources.
+        return new PaginatedResource(BookResource::collection($books));
     }
 
     /**
@@ -86,29 +82,21 @@ class BookController extends Controller
      */
     public function store(StoreBookRequest $request)
     {
-        // TODO: Implementar aqui
-        //
-        // Dicas:
-        // - Os dados já estão validados pelo StoreBookRequest
-        // - A validação de título duplicado é automática (retorna 409)
-        // - Use Book::create() para criar
-        // - Use BookResource para formatar resposta
-        // - Retorne status 201
-        // - Considere carregar o autor com with('author') se necessário
-        //
-        // Exemplo:
-        // $book = Book::create($request->validated());
-        // $book->load('author'); // Carregar dados do autor
-        // return response()->json([
-        //     'data' => new BookResource($book)
-        // ], 201);
-        
-        return response()->json([
-            'message' => 'TODO: Implementar criação de livro',
-            'endpoint' => 'POST /api/books',
-            'documentation' => 'Consulte docs/API_ENDPOINTS.md',
-            'validation' => 'Título único por autor já validado automaticamente'
-        ], 501);
+        // 1. Os dados já foram validados pelo StoreBookRequest,
+        //    incluindo a regra de título único por autor (que retorna 409).
+        $validatedData = $request->validated();
+
+        // 2. Cria o livro no banco de dados com os dados validados.
+        $book = Book::create($validatedData);
+
+        // 3. Carrega o relacionamento 'author' para que ele seja incluído na resposta.
+        //    O BookResource está configurado para incluir o autor se ele estiver carregado.
+        $book->load('author');
+
+        // 4. Retorna o novo livro, formatado pelo Resource, com o status 201 Created.
+        return (new BookResource($book))
+                ->response()
+                ->setStatusCode(201);
     }
 
     /**
@@ -125,23 +113,13 @@ class BookController extends Controller
      */
     public function show($id)
     {
-        // TODO: Implementar aqui
-        //
-        // Dicas:
-        // - Use Book::with('author')->findOrFail() para busca com autor
-        // - Use BookResource para formatar resposta
-        //
-        // Exemplo:
-        // $book = Book::with('author')->findOrFail($id);
-        // return response()->json([
-        //     'data' => new BookResource($book)
-        // ]);
-        
-        return response()->json([
-            'message' => 'TODO: Implementar busca de livro',
-            'endpoint' => "GET /api/books/{$id}",
-            'documentation' => 'Consulte docs/API_ENDPOINTS.md'
-        ], 501);
+        // Use with('author') para carregar o autor junto com o livro (eager loading).
+        // Use findOrFail() para buscar o livro ou retornar 404 automaticamente.
+        $book = Book::with('author')->findOrFail($id);
+
+        // Retorna o livro encontrado, formatado pelo BookResource.
+        // O resource já está configurado para incluir os dados do autor.
+        return new BookResource($book);
     }
 
     /**
