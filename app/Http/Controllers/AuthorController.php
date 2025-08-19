@@ -101,25 +101,18 @@ class AuthorController extends Controller
      */
     public function update(UpdateAuthorRequest $request, $id)
     {
-        // TODO: Implementar aqui
-        //
-        // Dicas:
-        // - Use Author::findOrFail() para busca com 404 automático
-        // - Use $author->update() para atualizar
-        // - Use AuthorResource para formatar resposta
-        //
-        // Exemplo:
-        // $author = Author::findOrFail($id);
-        // $author->update($request->validated());
-        // return response()->json([
-        //     'data' => new AuthorResource($author)
-        // ]);
-        
-        return response()->json([
-            'message' => 'TODO: Implementar atualização de autor',
-            'endpoint' => "PUT /api/authors/{$id}",
-            'documentation' => 'Consulte docs/API_ENDPOINTS.md'
-        ], 501);
+        // 1. Busca o autor pelo ID. Se não encontrar, retorna 404 automaticamente.
+        $author = Author::findOrFail($id);
+
+        // 2. A validação já foi feita pelo UpdateAuthorRequest.
+        //    O método validated() retorna os dados que passaram na validação.
+        $validatedData = $request->validated();
+
+        // 3. Atualiza o autor no banco de dados com os dados validados.
+        $author->update($validatedData);
+
+        // 4. Retorna o autor com os dados atualizados, formatado pelo Resource.
+        return new AuthorResource($author);
     }
 
     /**
