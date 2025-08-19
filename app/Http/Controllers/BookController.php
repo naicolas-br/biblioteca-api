@@ -139,27 +139,22 @@ class BookController extends Controller
      */
     public function update(UpdateBookRequest $request, $id)
     {
-        // TODO: Implementar aqui
-        //
-        // Dicas:
-        // - Use Book::findOrFail() para busca com 404 automático
-        // - Use $book->update() para atualizar
-        // - Use BookResource para formatar resposta
-        // - Carregue o autor se necessário
-        //
-        // Exemplo:
-        // $book = Book::findOrFail($id);
-        // $book->update($request->validated());
-        // $book->load('author'); // Recarregar com dados do autor
-        // return response()->json([
-        //     'data' => new BookResource($book)
-        // ]);
-        
-        return response()->json([
-            'message' => 'TODO: Implementar atualização de livro',
-            'endpoint' => "PUT /api/books/{$id}",
-            'documentation' => 'Consulte docs/API_ENDPOINTS.md'
-        ], 501);
+        // 1. Busca o livro pelo ID. Se não encontrar, retorna 404 automaticamente.
+        $book = Book::findOrFail($id);
+
+        // 2. A validação já foi feita pelo UpdateBookRequest.
+        //    Isto também trata a regra de negócio de título duplicado (retornando 409).
+        $validatedData = $request->validated();
+
+        // 3. Atualiza o livro no banco de dados com os dados validados.
+        $book->update($validatedData);
+
+        // 4. Recarrega o relacionamento 'author' para garantir que a resposta
+        //    contenha os dados do autor, mesmo que o autor_id tenha sido alterado.
+        $book->load('author');
+
+        // 5. Retorna o livro com os dados atualizados, formatado pelo Resource.
+        return new BookResource($book);
     }
 
     /**
