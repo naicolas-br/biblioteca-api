@@ -162,26 +162,18 @@ class AuthorController extends Controller
      */
     public function books($id, Request $request)
     {
-        // TODO: Implementar aqui
-        //
-        // Dicas:
-        // - Use Author::findOrFail() para busca
-        // - Use $author->books()->paginate() para livros paginados
-        // - Use PaginatedResource com BookResource::collection()
-        // - Considere usar with('author') no eager loading se necessário
-        //
-        // Exemplo:
-        // $author = Author::findOrFail($id);
-        // $books = $author->books()
-        //                ->orderBy($request->sort ?? 'titulo')
-        //                ->paginate($request->per_page ?? 15);
-        // 
-        // return new PaginatedResource(BookResource::collection($books));
-        
-        return response()->json([
-            'message' => 'TODO: Implementar listagem de livros do autor',
-            'endpoint' => "GET /api/authors/{$id}/books",
-            'documentation' => 'Consulte docs/API_ENDPOINTS.md'
-        ], 501);
+        // 1. Busca o autor pelo ID. Se não encontrar, retorna 404 automaticamente.
+        $author = Author::findOrFail($id);
+
+        // 2. Normaliza os parâmetros de paginação, como fizemos no index.
+        $perPage = max(1, min(100, (int) $request->input('per_page', 15)));
+
+        // 3. Acessa o relacionamento 'books()' do autor para obter uma query
+        //    e então aplica a paginação.
+        $books = $author->books()->paginate($perPage);
+
+        // 4. Retorna a coleção de livros paginada, formatada pelo PaginatedResource
+        //    que por sua vez usará o BookResource para cada livro.
+        return new PaginatedResource(BookResource::collection($books));
     }
 }
