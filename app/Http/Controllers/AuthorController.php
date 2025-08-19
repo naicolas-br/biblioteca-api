@@ -75,25 +75,15 @@ class AuthorController extends Controller
      * Status: 200 OK
      * Status: 404 Not Found
      */
-    public function show($id)
-    {
-        // TODO: Implementar aqui
-        //
-        // Dicas:
-        // - Use Author::findOrFail() para busca com 404 automático
-        // - Use AuthorResource para formatar resposta
-        //
-        // Exemplo:
-        // $author = Author::findOrFail($id);
-        // return response()->json([
-        //     'data' => new AuthorResource($author)
-        // ]);
-        
-        return response()->json([
-            'message' => 'TODO: Implementar busca de autor',
-            'endpoint' => "GET /api/authors/{$id}",
-            'documentation' => 'Consulte docs/API_ENDPOINTS.md'
-        ], 501);
+    public function show($id) {
+        // Use findOrFail para buscar o autor pelo ID.
+        // Se o autor não for encontrado, o Laravel automaticamente
+        // lançará uma exceção que resulta em uma resposta 404 Not Found.
+        $author = Author::findOrFail($id);
+
+        // Se o autor for encontrado, retorne-o formatado pelo AuthorResource.
+        // O status 200 OK é o padrão para respostas bem-sucedidas.
+        return new AuthorResource($author);
     }
 
     /**
