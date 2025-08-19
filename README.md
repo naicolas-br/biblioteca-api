@@ -1,64 +1,67 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+# 📚 Biblioteca API  
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+API RESTful desenvolvida em **Laravel** para gerenciamento de biblioteca, permitindo o cadastro e controle de **autores** e **livros**, com regras de negócio, paginação e filtros.  
 
-## About Laravel
+## 🚀 Funcionalidades  
+- ✅ **CRUD de Autores** (Create, Read, Update, Delete)  
+- ✅ **CRUD de Livros** (Create, Read, Update, Delete)  
+- ✅ Relacionamento entre autores e livros  
+- ✅ Validações robustas via *Form Requests*  
+- ✅ Regras de negócio (ex: não permitir exclusão de autor com livros cadastrados)  
+- ✅ Paginação e filtros avançados (busca e ordenação)  
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🔗 Endpoints principais  
+### Autores  
+- `GET /api/authors` → Listar autores (com paginação e busca)  
+- `POST /api/authors` → Criar autor  
+- `GET /api/authors/{id}` → Detalhar autor  
+- `PUT /api/authors/{id}` → Atualizar autor  
+- `DELETE /api/authors/{id}` → Excluir autor (restrição: só se não possuir livros)  
+- `GET /api/authors/{id}/books` → Listar livros de um autor  
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Livros  
+- `GET /api/books` → Listar livros (com filtros e paginação)  
+- `POST /api/books` → Criar livro  
+- `GET /api/books/{id}` → Detalhar livro  
+- `PUT /api/books/{id}` → Atualizar livro  
+- `DELETE /api/books/{id}` → Excluir livro  
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🛠️ Tecnologias utilizadas  
+- [Laravel](https://laravel.com/)  
+- [MySQL](https://www.mysql.com/)  
+- [Postman](https://www.postman.com/) / [Insomnia](https://insomnia.rest/) para testes manuais  
 
-## Learning Laravel
+## ⚙️ Como executar o projeto  
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 1. Clonar o repositório  
+```bash
+git clone https://github.com/seu-usuario/biblioteca-api.git
+cd biblioteca-api
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 2. Instalar dependências
+```bash
+composer install
+```
+### 3. Configurar o ambiente
+```bash
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=biblioteca_api
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-## Laravel Sponsors
+### 4. Executar Migrations e Seeds
+```bash
+php artisan migrate --seed
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+### 5 Iniciar o servidor
+```bash
+php artisan serve
+```
 
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+A API estará disponível em:
+👉 http://localhost:8000/api
