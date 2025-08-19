@@ -29,42 +29,46 @@ class BookController extends Controller
      */
     public function index(Request $request)
     {
-        // Normaliza o número de itens por página, garantindo que esteja entre 1 e 100.
-        $perPage = max(1, min(100, (int) $request->input('per_page', 15)));
-
-        $books = Book::query()
-            // Faz o Eager Loading do autor para evitar o problema de N+1 queries.
-            ->with('author')
-
-            // Aplica os filtros condicionalmente, apenas se eles existirem na request.
-            ->when($request->input('q'), function ($query, $term) {
-                // Assume que o Model Book tem um scope 'search'
-                $query->search($term);
-            })
-            ->when($request->input('author_id'), function ($query, $authorId) {
-                // Assume que o Model Book tem um scope 'byAuthor'
-                $query->byAuthor($authorId);
-            })
-            ->when($request->has('disponivel'), function ($query) use ($request) {
-                // Assume que o Model Book tem um scope 'byAvailability'
-                $query->byAvailability($request->boolean('disponivel'));
-            })
-            ->when($request->input('ano_de') || $request->input('ano_ate'), function ($query) use ($request) {
-                // Assume que o Model Book tem um scope 'byYearRange'
-                $query->byYearRange($request->input('ano_de'), $request->input('ano_ate'));
-            })
-
-            // Aplica a ordenação.
-            // TODO: É uma boa prática criar um scope 'orderBy' no Model Book,
-            // assim como você fez no Author, para validar os campos.
-            ->applyOrder($request->input('sort', 'titulo'), $request->input('direction', 'asc'))
-
-            // Executa a paginação e mantém os parâmetros de filtro nos links.
-            ->paginate($perPage)
-            ->withQueryString();
-
-        // Retorna a resposta paginada usando os Resources.
-        return new PaginatedResource(BookResource::collection($books));
+        // TODO: Implementar aqui
+        //
+        // Dicas:
+        // - Use os scopes do Model Book: search(), byAuthor(), byAvailability(), byYearRange()
+        // - Use with('author') para eager loading
+        // - Use when() para aplicar filtros condicionalmente
+        // - Normalize per_page (min: 1, max: 100, default: 15)
+        //
+        // Exemplo:
+        // $books = Book::with('author')
+        //             ->when($request->q, function($query, $term) {
+        //                 $query->search($term);
+        //             })
+        //             ->when($request->author_id, function($query, $authorId) {
+        //                 $query->byAuthor($authorId);
+        //             })
+        //             ->when($request->has('disponivel'), function($query) use ($request) {
+        //                 $query->byAvailability($request->boolean('disponivel'));
+        //             })
+        //             ->when($request->ano_de || $request->ano_ate, function($query) use ($request) {
+        //                 $query->byYearRange($request->ano_de, $request->ano_ate);
+        //             })
+        //             ->orderBy($request->sort ?? 'titulo')
+        //             ->paginate($request->per_page ?? 15);
+        //
+        // return new PaginatedResource(BookResource::collection($books));
+        
+        return response()->json([
+            'message' => 'TODO: Implementar listagem de livros com filtros',
+            'endpoint' => 'GET /api/books',
+            'available_filters' => [
+                'q' => 'Buscar em título e gênero',
+                'author_id' => 'Filtrar por autor',
+                'disponivel' => 'true/false para disponibilidade',
+                'ano_de' => 'Ano mínimo de publicação', 
+                'ano_ate' => 'Ano máximo de publicação',
+                'sort' => 'Campo para ordenação'
+            ],
+            'documentation' => 'Consulte docs/API_ENDPOINTS.md'
+        ], 501);
     }
 
     /**

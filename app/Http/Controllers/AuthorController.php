@@ -129,35 +129,23 @@ class AuthorController extends Controller
      */
     public function destroy($id)
     {
-        // TODO: Implementar aqui
-        //
-        // ⚠️ ATENÇÃO: Esta é a parte mais importante!
-        // 
-        // Dicas:
-        // - Use Author::findOrFail() para busca
-        // - Verifique se tem livros: $author->books()->count() > 0
-        // - Se tiver livros, retorne 409 com mensagem explicativa
-        // - Se não tiver, use $author->delete() e retorne 204
-        //
-        // Exemplo:
-        // $author = Author::findOrFail($id);
-        // 
-        // if ($author->books()->count() > 0) {
-        //     return response()->json([
-        //         'message' => 'Não é possível excluir autor que possui livros associados.',
-        //         'status' => 409
-        //     ], 409);
-        // }
-        // 
-        // $author->delete();
-        // return response()->noContent(); // 204
-        
-        return response()->json([
-            'message' => 'TODO: Implementar exclusão de autor com regra de negócio',
-            'endpoint' => "DELETE /api/authors/{$id}",
-            'documentation' => 'Consulte docs/BUSINESS_RULES.md',
-            'important' => 'Não esqueça da regra: não excluir autor com livros!'
-        ], 501);
+        // 1. Busca o autor pelo ID. Se não encontrar, retorna 404 automaticamente.
+        $author = Author::findOrFail($id);
+
+        // 2. Verifica se o autor possui algum livro associado.
+        // O método has('books') é uma forma eficiente de fazer essa verificação.
+        if ($author->books()->exists()) {
+            // 3. Se tiver livros, retorna um erro 409 Conflict com uma mensagem clara.
+            return response()->json([
+                'message' => 'Não é possível excluir o autor, pois ele possui livros associados.'
+            ], 409);
+        }
+
+        // 4. Se não tiver livros, prossegue com a exclusão.
+        $author->delete();
+
+        // 5. Retorna uma resposta 204 No Content, que é o padrão para exclusões bem-sucedidas.
+        return response()->noContent();
     }
 
     /**
