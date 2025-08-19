@@ -171,22 +171,14 @@ class BookController extends Controller
      */
     public function destroy($id)
     {
-        // TODO: Implementar aqui
-        //
-        // Dicas:
-        // - Use Book::findOrFail() para busca
-        // - Use $book->delete() para excluir
-        // - Retorne response()->noContent() para 204
-        //
-        // Exemplo:
-        // $book = Book::findOrFail($id);
-        // $book->delete();
-        // return response()->noContent(); // 204
-        
-        return response()->json([
-            'message' => 'TODO: Implementar exclusão de livro',
-            'endpoint' => "DELETE /api/books/{$id}",
-            'documentation' => 'Consulte docs/API_ENDPOINTS.md'
-        ], 501);
+        // 1. Busca o livro pelo ID. Se não encontrar, retorna 404 automaticamente.
+        $book = Book::findOrFail($id);
+
+        // 2. Exclui o livro do banco de dados.
+        $book->delete();
+
+        // 3. Retorna uma resposta 204 No Content, indicando sucesso sem corpo de resposta.
+        return response()->noContent();
+
     }
 }
