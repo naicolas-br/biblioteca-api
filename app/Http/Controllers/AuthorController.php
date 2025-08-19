@@ -52,25 +52,16 @@ class AuthorController extends Controller
      */
     public function store(StoreAuthorRequest $request)
     {
-        // TODO: Implementar aqui
-        //
-        // Dicas:
-        // - Os dados já estão validados pelo StoreAuthorRequest
-        // - Use Author::create() para criar
-        // - Use AuthorResource para formatar resposta
-        // - Retorne status 201
-        //
-        // Exemplo:
-        // $author = Author::create($request->validated());
-        // return response()->json([
-        //     'data' => new AuthorResource($author)
-        // ], 201);
-        
-        return response()->json([
-            'message' => 'TODO: Implementar criação de autor',
-            'endpoint' => 'POST /api/authors',
-            'documentation' => 'Consulte docs/API_ENDPOINTS.md'
-        ], 501);
+        // Os dados já foram validados pelo StoreAuthorRequest.
+        // O método validated() retorna um array apenas com os dados 
+        // que passaram nas regras de validação ('nome' e 'bio').
+        $author = Author::create($request->validated());
+
+        // Retorna o novo autor, formatado pelo AuthorResource,
+        // e define o código de status HTTP para 201 Created.
+        return (new AuthorResource($author))
+                ->response()
+                ->setStatusCode(201);
     }
 
     /**
